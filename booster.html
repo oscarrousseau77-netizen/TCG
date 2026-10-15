@@ -7,7 +7,8 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;1,500&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600&family=Silkscreen&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&text=%E3%83%89%E3%83%B3!&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;1,500&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600&family=Silkscreen&family=Bangers&display=swap">
 <style>
 /* Écran d'ouverture : une scène sombre, un seul objet au centre (le booster, puis la carte du dessus). Tout se fait au clic ou au tapotement. */
 :root {
@@ -21,6 +22,7 @@
   --f-body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
   --f-card: "Barlow Condensed", "Arial Narrow", system-ui, sans-serif;
   --f-pixel: "Silkscreen", ui-monospace, monospace;
+  --f-comic: "Bangers", "Impact", "Arial Black", sans-serif;
   --cw: min(76vw, 330px, calc((100dvh - 190px) * 63 / 88));
   color-scheme: dark;
 }
@@ -205,6 +207,28 @@ header { display: flex; justify-content: space-between; align-items: center; gap
 .v-gold .sparks { display: block; }
 .v-gold .sparks span { background: #fff4c4; }
 
+/* Manga */
+.sfx { display: none; }
+.v-manga .frame { background: #fbfbf8; box-shadow: inset 0 0 0 1.2cqw #111; }
+.v-manga .top { background: #111; color: #fff; border-radius: 0; transform: skewX(-6deg); }
+.v-manga .name { font: 400 9.5cqw/1 var(--f-comic); letter-spacing: .05em; }
+.v-manga .art { border-radius: 0; box-shadow: none; clip-path: polygon(0 7%, 100% 0, 100% 100%, 0 100%); background: #fff; }
+.v-manga .art img { filter: grayscale(1) contrast(1.9) brightness(1.1); }
+.v-manga .art::before { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: repeating-conic-gradient(from 0deg at 50% 42%, rgba(0,0,0,.6) 0 .8deg, transparent .8deg 6deg);
+  -webkit-mask-image: radial-gradient(circle at 50% 42%, transparent 34%, #000 62%); mask-image: radial-gradient(circle at 50% 42%, transparent 34%, #000 62%); }
+.v-manga .art::after { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; mix-blend-mode: multiply;
+  background: radial-gradient(circle, rgba(0,0,0,.28) 26%, transparent 30%) 0 0 / 1.8cqw 1.8cqw; }
+.v-manga .art .ribbon { background: #fff; color: #111; border-top: .9cqw solid #111; font: 400 5.6cqw/1.1 var(--f-comic); letter-spacing: .05em; }
+.v-manga .sfx { display: block; position: absolute; z-index: 2; top: 9cqw; right: 4cqw; font: 400 14cqw/1 "Dela Gothic One", var(--f-comic);
+  color: #fff; -webkit-text-stroke: 1cqw #111; paint-order: stroke fill; transform: rotate(10deg); }
+.v-manga .flavor { background: #fff; color: #111; font-weight: 600; border: .8cqw solid #111; border-radius: 50%; overflow: visible;
+  display: flex; align-items: center; justify-content: center; text-align: center; padding: 2cqw 9cqw; margin-top: 2cqw; }
+.v-manga .flavor::before { content: ""; position: absolute; top: -4.2cqw; left: 24%; width: 6cqw; height: 5cqw; background: #111; clip-path: polygon(0 0, 100% 100%, 20% 100%); }
+.v-manga .flavor::after { content: ""; position: absolute; top: -2.4cqw; left: calc(24% + 1.2cqw); width: 4cqw; height: 3.6cqw; background: #fff; clip-path: polygon(0 0, 100% 100%, 20% 100%); }
+.v-manga .foot { color: #111; }
+.v-manga .glare { opacity: .2; }
+
 /* ---------- Dos de carte (repris de la maquette) ---------- */
 .cardback { --glare: .55; }
 .cardback .sweep { display: block; background: linear-gradient(110deg, transparent 40%, rgba(255,233,168,.45) 49%, rgba(255,255,255,.75) 50%, rgba(255,233,168,.45) 51%, transparent 60%); background-size: 260% 100%; }
@@ -294,7 +318,9 @@ header { display: flex; justify-content: space-between; align-items: center; gap
     { common: 80, rare: 18, epic: 2, legend: 0 },
     { common: 50, rare: 40, epic: 9, legend: 1 },
   ];
-  const VAR_RATES = { normal: 88, pixel: 7, full: 4, gold: 1 };
+  const VAR_RATES = { normal: 84, pixel: 7, full: 4, manga: 4, gold: 1 };
+  /* ?variante=manga (ou pixel, full, gold) force la variante des cartes tirées, pour tester */
+  const FORCE_V = (() => { try { const v = new URLSearchParams(location.search).get("variante"); return v in VAR_RATES ? v : null; } catch (e) { return null; } })();
   const pick = table => { let x = Math.random() * 100; for (const k in table) { if ((x -= table[k]) < 0) return k; } return Object.keys(table)[0]; };
 
   /* ---------- Photos d'exemple dessinées (reprises de la maquette) ---------- */
@@ -387,7 +413,7 @@ header { display: flex; justify-content: space-between; align-items: center; gap
     return `<div class="card r-${d.r} v-${d.v}" style="--fx:${d.fx ?? 50}%;--fy:${d.fy ?? 50}%">
       <div class="frame">
         <div class="top"><span class="name">${esc(d.name)}</span><span class="gem"></span></div>
-        <div class="art"><img class="photo" alt="" src="${d.photo}"><img class="px" alt="" src="${d.px || d.photo}"><div class="ribbon">${esc(d.title)}</div></div>
+        <div class="art"><img class="photo" alt="" src="${d.photo}"><img class="px" alt="" src="${d.px || d.photo}"><div class="ribbon">${esc(d.title)}</div><span class="sfx" aria-hidden="true">ドン!</span></div>
         <div class="ribbon">${esc(d.title)}</div>
         <p class="flavor">${esc(d.flavor)}</p>
         <div class="foot"><span>S1 · ${d.num}/060</span><span>${esc(d.place)}</span></div>
@@ -418,7 +444,7 @@ header { display: flex; justify-content: space-between; align-items: center; gap
       let r = pick(rates), opts = POOL[r].filter(c => !used.has(c.num));
       if (!opts.length) { r = "common"; opts = POOL.common.filter(c => !used.has(c.num)); }
       const base = opts[Math.floor(Math.random() * opts.length)]; used.add(base.num);
-      cards.push({ ...base, r, v: pick(VAR_RATES), ...sceneSrc(base.scene) });
+      cards.push({ ...base, r, v: FORCE_V || pick(VAR_RATES), ...sceneSrc(base.scene) });
     });
     cards.push({ ...DJ });
     return cards;
@@ -444,7 +470,7 @@ header { display: flex; justify-content: space-between; align-items: center; gap
   }
   function buildPile() {
     pile.innerHTML = cards.map((c, k) => `<div class="slotc r-${c.r}" style="z-index:${10 - k}; --c:${COLOR[c.r]}">
-      <div class="label">${RAR[c.r]}${c.v !== "normal" ? " · " + { pixel: "Pixel art", full: "Full art", gold: "Dorée" }[c.v] : ""}</div>
+      <div class="label">${RAR[c.r]}${c.v !== "normal" ? " · " + { pixel: "Pixel art", full: "Full art", manga: "Manga", gold: "Dorée" }[c.v] : ""}</div>
       <div class="inner"><div class="face back"><div class="card cardback"><div class="cb"><div class="cb-rays"></div><div class="cb-inner"><span class="cb-top">Les Potes</span><div class="cb-medal"><i class="gl"></i><i class="ge"></i><i class="gr"></i><i class="gc"></i><b>S1</b></div><span class="cb-bottom">Saison 1 · 60 cartes</span></div></div><div class="fx sweep"></div><div class="fx glare"></div></div><div class="aura"></div></div><div class="face front">${cardHTML(c)}</div></div></div>`).join("");
     slots = [...pile.children];
     slots.forEach((s, k) => { s.style.transform = `translate(${k * 3}px, ${k * 4}px)`; s.querySelector(".inner").style.transitionDuration = ""; });
