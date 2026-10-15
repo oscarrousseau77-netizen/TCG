@@ -83,6 +83,7 @@ figcaption .v b { color: var(--fg); font-weight: 600; }
   box-shadow: 0 0 0 .7cqw var(--art-edge); flex: none; }
 .art img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .art .px { display: none; image-rendering: pixelated; }
+.art img.photo { object-position: var(--fx, 50%) var(--fy, 50%); transform: scale(var(--z, 1)); transform-origin: var(--fx, 50%) var(--fy, 50%); }
 .ribbon { position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; padding: 1.4cqw 3cqw; background: var(--ribbon); color: #fff;
   font: italic 500 5.4cqw/1.1 var(--f-card); letter-spacing: .02em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .flavor { position: relative; z-index: 2; flex: 1; min-height: 0; overflow: hidden; background: var(--plate); color: var(--plate-ink);
@@ -172,6 +173,15 @@ figcaption .v b { color: var(--fg); font-weight: 600; }
 .zoom .card { cursor: grab; touch-action: none; }
 .zoom p { color: var(--muted); font-size: 13px; text-align: center; }
 
+.crop-row { display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start; }
+.crop-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 230px)); gap: 20px; flex: 0 1 480px; min-width: 0; }
+.crop-controls { display: flex; flex-direction: column; gap: 10px; flex: 1 1 220px; max-width: 320px; }
+.crop-controls .v { color: var(--muted); font-size: 13px; }
+.crop-controls label { font: 700 16px/1 var(--f-card); text-transform: uppercase; letter-spacing: .04em; }
+.crop-controls input { width: 100%; accent-color: var(--accent); }
+.crop-controls .btn { align-self: flex-start; }
+#cadrage .card { cursor: move; touch-action: none; animation: none; }
+@media (max-width: 780px) { .crop-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); flex-basis: 100%; } .crop-controls { max-width: none; } }
 .rates { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; background: var(--line); border-radius: 12px; overflow: hidden; }
 .rates div { background: var(--surface); padding: 14px 16px; display: flex; flex-direction: column; gap: 4px; }
 .rates b { font: 700 22px/1 var(--f-card); font-variant-numeric: tabular-nums; }
@@ -193,6 +203,22 @@ figcaption .v b { color: var(--fg); font-weight: 600; }
     </div>
     <p class="hint" id="hint" hidden>Ta photo reste sur ton téléphone, elle n’est envoyée nulle part.</p>
   </header>
+
+  <section id="cadrage" hidden>
+    <div class="sec-head">
+      <h2>Cadrer ta photo</h2>
+      <p>La photo remplit toujours le cadre, quel que soit son format : pas de bande noire, on recadre. Fais glisser la photo dans une des cartes pour choisir ce qui reste visible, et zoome si besoin. Le réglage s’applique à toutes les cartes, y compris la version pixel art.</p>
+    </div>
+    <div class="crop-row">
+      <div class="crop-cards" id="cropCards"></div>
+      <div class="crop-controls">
+        <p class="v" id="fmt"></p>
+        <label for="zoomRange">Zoom</label>
+        <input type="range" id="zoomRange" min="1" max="3" step="0.01" value="1">
+        <button class="btn ghost" id="recenter" type="button">Recentrer</button>
+      </div>
+    </div>
+  </section>
 
   <section>
     <div class="sec-head">
@@ -317,28 +343,51 @@ figcaption .v b { color: var(--fg); font-weight: 600; }
     return c;
   }
   /* Photo source (600×840, recadrée au centre) -> version pixel art 60×48 */
-  function pixelate(src) {
+  /* Cadrage partagé par toutes les cartes : point de focus (0-1) et zoom (≥ 1, donc jamais de bande noire) */
+  const crop = { fx: .5, fy: .5, z: 1 };
+  let custom = null;
+  /* Zone de la photo d'origine visible dans un cadre bw×bh, avec object-fit: cover + le cadrage */
+  function visibleRect(iw, ih, bw, bh) {
+    const s0 = Math.max(bw / iw, bh / ih), z = crop.z;
+    return [crop.fx * (iw * s0 - bw / z) / s0, crop.fy * (ih * s0 - bh / z) / s0, bw / z / s0, bh / z / s0];
+  }
+  function pixelate(src, iw, ih) {
     const pw = 60, ph = 48, c = document.createElement("canvas"); c.width = pw; c.height = ph;
-    const g = c.getContext("2d"), cropH = W * ph / pw;
-    g.imageSmoothingEnabled = true; g.drawImage(src, 0, (H - cropH) / 2, W, cropH, 0, 0, pw, ph);
+    const g = c.getContext("2d");
+    g.imageSmoothingEnabled = true; g.drawImage(src, ...visibleRect(iw, ih, pw, ph), 0, 0, pw, ph);
     const d = g.getImageData(0, 0, pw, ph), q = 255 / 4;
     for (let i = 0; i < d.data.length; i += 4) for (let k = 0; k < 3; k++) d.data[i + k] = Math.round(d.data[i + k] / q) * q;
     g.putImageData(d, 0, 0);
     return c.toDataURL("image/png");
   }
-  function sourceFromImage(img) {
-    const c = document.createElement("canvas"); c.width = W; c.height = H;
-    const g = c.getContext("2d"), s = Math.max(W / img.naturalWidth, H / img.naturalHeight);
-    const w = img.naturalWidth * s, h = img.naturalHeight * s;
-    g.drawImage(img, (W - w) / 2, (H - h) / 2, w, h);
-    return c;
+  /* Réduit la photo chargée (côté le plus long : 1600 px) sans la recadrer */
+  function shrink(img) {
+    const k = Math.min(1, 1600 / Math.max(img.naturalWidth, img.naturalHeight));
+    const c = document.createElement("canvas"); c.width = Math.round(img.naturalWidth * k); c.height = Math.round(img.naturalHeight * k);
+    c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+    return { img: c, url: c.toDataURL("image/jpeg", .9), w: c.width, h: c.height };
   }
 
-  const sources = {};
-  function makeSources(custom) {
+  const sources = {}, scenes = {};
+  function makeSources() {
     CARDS.forEach((d, i) => {
-      const src = custom || scene(d.scene, 7 + i * 13);
-      sources[d.scene] = { photo: src.toDataURL("image/jpeg", .88), px: pixelate(src) };
+      if (custom) { sources[d.scene] = { photo: custom.url, px: pixelate(custom.img, custom.w, custom.h) }; return; }
+      const sc = scenes[d.scene] || (scenes[d.scene] = scene(d.scene, 7 + i * 13));
+      sources[d.scene] = { photo: sc.toDataURL("image/jpeg", .88), px: pixelate(sc, W, H) };
+    });
+  }
+  function applyCrop() {
+    const st = document.documentElement.style;
+    st.setProperty("--fx", (crop.fx * 100).toFixed(2) + "%");
+    st.setProperty("--fy", (crop.fy * 100).toFixed(2) + "%");
+    st.setProperty("--z", crop.z.toFixed(3));
+    document.getElementById("zoomRange").value = crop.z;
+    if (!custom || applyCrop.raf) return;
+    applyCrop.raf = requestAnimationFrame(() => {
+      applyCrop.raf = 0;
+      const px = pixelate(custom.img, custom.w, custom.h);
+      CARDS.forEach(d => sources[d.scene].px = px);
+      document.querySelectorAll(".art .px").forEach(i => i.src = px);
     });
   }
 
@@ -366,8 +415,36 @@ figcaption .v b { color: var(--fg); font-weight: 600; }
     const rare = CARDS[1];
     document.getElementById("variants").innerHTML = VARIANTS.map(x =>
       `<figure>${cardHTML(rare, x.v)}<figcaption><span class="k">${x.label}</span><span class="v">${x.info}</span></figcaption></figure>`).join("");
-    document.querySelectorAll(".page .card").forEach(bindTilt);
+    document.querySelectorAll("#rarities .card, #variants .card").forEach(bindTilt);
+    const cc = document.getElementById("cropCards");
+    cc.innerHTML = custom ? [["normal", "Normale"], ["full", "Full art"]].map(([v, l]) =>
+      `<figure>${cardHTML(rare, v)}<figcaption><span class="k">${l}</span></figcaption></figure>`).join("") : "";
+    cc.querySelectorAll(".card").forEach(bindPan);
   }
+
+  /* ---------- Cadrage : glisser la photo dans la carte ---------- */
+  function bindPan(card) {
+    card.setAttribute("aria-label", "Cadrage de la photo : glisse, ou utilise les flèches du clavier");
+    let last = null;
+    card.addEventListener("pointerdown", e => { last = [e.clientX, e.clientY]; card.setPointerCapture(e.pointerId); });
+    card.addEventListener("pointermove", e => {
+      if (!last) return;
+      const b = card.querySelector(".art").getBoundingClientRect(), s0 = Math.max(b.width / custom.w, b.height / custom.h);
+      const ox = custom.w * s0 * crop.z - b.width, oy = custom.h * s0 * crop.z - b.height;
+      if (ox > 1) crop.fx = Math.min(1, Math.max(0, crop.fx - (e.clientX - last[0]) / ox));
+      if (oy > 1) crop.fy = Math.min(1, Math.max(0, crop.fy - (e.clientY - last[1]) / oy));
+      last = [e.clientX, e.clientY]; applyCrop();
+    });
+    const stop = () => { last = null; };
+    card.addEventListener("pointerup", stop); card.addEventListener("pointercancel", stop);
+    card.addEventListener("keydown", e => {
+      const k = { ArrowLeft: [-.04, 0], ArrowRight: [.04, 0], ArrowUp: [0, -.04], ArrowDown: [0, .04] }[e.key];
+      if (!k) return; e.preventDefault();
+      crop.fx = Math.min(1, Math.max(0, crop.fx + k[0])); crop.fy = Math.min(1, Math.max(0, crop.fy + k[1])); applyCrop();
+    });
+  }
+  document.getElementById("zoomRange").addEventListener("input", e => { crop.z = +e.target.value; applyCrop(); });
+  document.getElementById("recenter").addEventListener("click", () => { Object.assign(crop, { fx: .5, fy: .5, z: 1 }); applyCrop(); });
 
   /* ---------- Inclinaison et reflets ---------- */
   function bindTilt(card) {
@@ -396,24 +473,42 @@ figcaption .v b { color: var(--fg); font-weight: 600; }
     slot.replaceChildren(clone); bindTilt(clone); zoom.hidden = false;
   }
   function closeZoom() { zoom.hidden = true; slot.replaceChildren(); lastFocus && lastFocus.focus({ preventScroll: true }); }
-  document.querySelector(".page").addEventListener("click", e => { const c = e.target.closest(".card"); if (c) openZoom(c); });
-  document.querySelector(".page").addEventListener("keydown", e => { const c = e.target.closest(".card"); if (c && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); openZoom(c); } });
+  document.querySelector(".page").addEventListener("click", e => { const c = e.target.closest(".card"); if (c && !c.closest("#cadrage")) openZoom(c); });
+  document.querySelector(".page").addEventListener("keydown", e => { const c = e.target.closest(".card"); if (c && !c.closest("#cadrage") && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); openZoom(c); } });
   zoom.addEventListener("click", e => { if (!e.target.closest(".card")) closeZoom(); });
   document.addEventListener("keydown", e => { if (e.key === "Escape" && !zoom.hidden) closeZoom(); });
 
   /* ---------- Photo perso ---------- */
   const input = document.getElementById("photo"), reset = document.getElementById("reset"), hint = document.getElementById("hint");
+  const cadrage = document.getElementById("cadrage"), fmt = document.getElementById("fmt");
+  function describe(w, h) {
+    const r = h / w, kind = r > 1.6 ? "verticale type Snapchat / story" : r > 1.1 ? "portrait" : r < .85 ? "paysage" : "presque carrée";
+    return `Photo ${kind}, ${w} × ${h}.`;
+  }
   input.addEventListener("change", () => {
     const f = input.files && input.files[0]; if (!f) return;
     const url = URL.createObjectURL(f), img = new Image();
-    img.onload = () => { makeSources(sourceFromImage(img)); URL.revokeObjectURL(url); render(); reset.hidden = false; hint.hidden = false; };
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      custom = shrink(img); Object.assign(crop, { fx: .5, fy: .5, z: 1 });
+      fmt.textContent = describe(img.naturalWidth, img.naturalHeight);
+      makeSources(); render(); applyCrop();
+      reset.hidden = false; hint.hidden = false; cadrage.hidden = false;
+      hint.textContent = "Ta photo reste sur ton appareil, elle n’est envoyée nulle part.";
+      cadrage.scrollIntoView({ behavior: "smooth", block: "start" });
+    };
     img.onerror = () => { URL.revokeObjectURL(url); hint.hidden = false; hint.textContent = "Cette image n’a pas pu être lue. Essaie une photo JPEG ou PNG."; };
     img.src = url;
   });
-  reset.addEventListener("click", () => { makeSources(null); render(); reset.hidden = true; hint.hidden = true; input.value = ""; });
+  reset.addEventListener("click", () => {
+    custom = null; Object.assign(crop, { fx: .5, fy: .5, z: 1 });
+    makeSources(); render(); applyCrop();
+    reset.hidden = true; hint.hidden = true; cadrage.hidden = true; input.value = "";
+  });
 
-  makeSources(null);
+  makeSources();
   render();
+  applyCrop();
 })();
 </script>
 </body>
