@@ -7,7 +7,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;1,500&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600&family=Silkscreen&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;1,500&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600&family=Silkscreen&family=Caveat:wght@700&family=Bangers&display=swap">
 <style>
 /* Mise en page : un classeur de collection la nuit. Cartes en vedette sur fond sombre, une rangée par sujet (raretés, puis variantes). */
 :root {
@@ -21,6 +21,8 @@
   --f-body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
   --f-card: "Barlow Condensed", "Arial Narrow", system-ui, sans-serif;
   --f-pixel: "Silkscreen", ui-monospace, monospace;
+  --f-hand: "Caveat", "Segoe Print", "Bradley Hand", cursive;
+  --f-comic: "Bangers", "Impact", "Arial Black", sans-serif;
   color-scheme: dark;
 }
 @property --mx { syntax: "<percentage>"; inherits: true; initial-value: 50%; }
@@ -89,7 +91,7 @@ figcaption .v b { color: var(--fg); font-weight: 600; }
 .flavor { position: relative; z-index: 2; flex: 1; min-height: 0; overflow: hidden; background: var(--plate); color: var(--plate-ink);
   border-radius: 2cqw; padding: 2.6cqw 3.4cqw; font: 400 4.9cqw/1.35 var(--f-body); }
 .foot { position: relative; z-index: 2; display: flex; justify-content: space-between; gap: 2cqw; color: var(--foot-ink);
-  font: 600 3.6cqw/1 var(--f-card); letter-spacing: .05em; text-transform: uppercase; font-variant-numeric: tabular-nums; padding: 0 2.4cqw .4cqw; }
+  font: 600 3.6cqw/1 var(--f-card); letter-spacing: .05em; text-transform: uppercase; font-variant-numeric: tabular-nums; padding: 0 3.6cqw .6cqw; }
 .foot span:first-child { flex: none; }
 .foot span:last-child { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
@@ -140,7 +142,7 @@ figcaption .v b { color: var(--fg); font-weight: 600; }
 .v-pixel .glare { opacity: .15; }
 
 /* Full art */
-.v-full .art { position: absolute; inset: 2.2cqw; aspect-ratio: auto; border-radius: 3cqw; box-shadow: none; z-index: 1; }
+.v-full .art { position: absolute; inset: 1.3cqw; aspect-ratio: auto; border-radius: 3.6cqw; box-shadow: none; z-index: 1; }
 .v-full .top { background: rgba(10,10,14,.42); color: #fff; backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); margin: 0; }
 .v-full .ribbon { position: relative; z-index: 2; order: 3; margin-top: auto; border-radius: 1.6cqw; align-self: flex-start; max-width: 100%; }
 .v-full .art .ribbon { display: none; }
@@ -159,6 +161,59 @@ figcaption .v b { color: var(--fg); font-weight: 600; }
 .v-gold .foil { opacity: .1; }
 .v-gold .sparks { display: block; }
 .v-gold .sparks span { background: #fff4c4; }
+
+/* Pistes : signée, polaroid, BD */
+.sign { display: none; }
+.v-signed .sign { display: block; position: absolute; z-index: 2; right: 5cqw; bottom: 8cqw; font: 700 15cqw/1 var(--f-hand); color: #ffe08a;
+  transform: rotate(-9deg); text-shadow: 0 .3cqw 0 #7a520c, 0 0 2cqw rgba(0,0,0,.55); }
+.v-signed .foil { opacity: .14; }
+.v-full.v-signed .sign { bottom: auto; top: 34%; right: 7cqw; }
+
+.v-polaroid { border-radius: 1.6cqw; --flat: #f3efe4; }
+.v-polaroid .frame { background: linear-gradient(170deg, #fbf8f0, #ece6d6); padding: 5cqw 5cqw 3.4cqw; }
+.v-polaroid .top { order: 2; background: none; padding: 0 1cqw; color: #2a2620; }
+.v-polaroid .name { font: 700 10cqw/1 var(--f-hand); text-transform: none; }
+.v-polaroid .art { order: 1; border-radius: 0; box-shadow: inset 0 0 0 1px rgba(0,0,0,.15); aspect-ratio: 1 / 1; }
+.v-polaroid .art img { filter: sepia(.3) saturate(.85) contrast(.95) brightness(1.06); }
+.v-polaroid .art .ribbon { display: none; }
+.v-polaroid .flavor { order: 3; background: none; color: #4a443a; font: 700 6cqw/1.1 var(--f-hand); padding: 0 1cqw; }
+.v-polaroid .foot { order: 4; color: #8a8270; }
+
+.v-comic .art::after { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; mix-blend-mode: multiply;
+  background: radial-gradient(circle, rgba(0,0,0,.4) 28%, transparent 31%) 0 0 / 2.2cqw 2.2cqw; }
+.v-comic .art { box-shadow: 0 0 0 .9cqw #111; }
+.v-comic .art img { filter: contrast(1.5) saturate(1.7); }
+.v-comic .top, .v-comic .flavor { border: .9cqw solid #111; }
+.v-comic .name { font: 400 10cqw/1 var(--f-comic); letter-spacing: .04em; }
+.v-comic .ribbon { background: #ffe14d; color: #111; font: 400 6cqw/1.1 var(--f-comic); letter-spacing: .04em; border-top: .9cqw solid #111; }
+.v-comic .flavor { background: #fff; color: #111; font-weight: 600; border-radius: 4cqw; }
+
+/* ---------- Dos de carte ---------- */
+.cardback { --glare: .55; }
+.cardback .sweep { display: block; background: linear-gradient(110deg, transparent 40%, rgba(255,233,168,.45) 49%, rgba(255,255,255,.75) 50%, rgba(255,233,168,.45) 51%, transparent 60%); background-size: 260% 100%; }
+.cb { position: absolute; inset: 0; border-radius: inherit; overflow: hidden; background: #ece8f4; }
+.cb-rays { position: absolute; inset: 3.2cqw; border-radius: 3cqw;
+  background: repeating-conic-gradient(from 0deg at 50% 47%, rgba(242,193,78,.14) 0 5deg, transparent 5deg 15deg),
+              radial-gradient(circle at 50% 47%, #7a37b0, #2b1a55 52%, #150c2c); }
+.cb-inner { position: absolute; inset: 6.4cqw; border-radius: 2cqw; border: .6cqw solid rgba(242,193,78,.8);
+  display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 6cqw 3cqw 5cqw; text-align: center; }
+.cb-inner::before { content: ""; position: absolute; inset: 1.6cqw; border-radius: 1.2cqw; border: .3cqw solid rgba(242,193,78,.4); pointer-events: none; }
+.cb-top { font: 700 9cqw/1 var(--f-card); letter-spacing: .24em; text-transform: uppercase; color: #ffe9a8; padding-left: .24em; }
+.cb-bottom { font: 600 4.6cqw/1 var(--f-card); letter-spacing: .2em; text-transform: uppercase; color: rgba(255,233,168,.78); padding-left: .2em; }
+.cb-medal { position: relative; width: 54cqw; aspect-ratio: 1; border-radius: 50%; display: grid; place-items: center;
+  background: radial-gradient(circle at 40% 35%, #43307d, #1a1233 72%);
+  box-shadow: 0 0 0 1cqw #f2c14e, 0 0 0 2.2cqw #2b1a55, 0 0 0 2.8cqw rgba(242,193,78,.6), 0 0 10cqw rgba(242,193,78,.35); }
+.cb-medal b { font: 800 22cqw/1 var(--f-display); color: #f2c14e; letter-spacing: -.03em; transform: rotate(-10deg); text-shadow: 0 1.2cqw 0 #b2367e; }
+.cb-medal i { position: absolute; width: 9cqw; height: 9cqw; transform: translate(-50%, -50%); filter: drop-shadow(0 0 1cqw rgba(0,0,0,.6)); }
+.cb-medal .gl { left: 50%; top: 0; background: radial-gradient(circle at 35% 30%, #fffbe6, #f2c14e 45%, #a8761c);
+  clip-path: polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); width: 11cqw; height: 11cqw; }
+.cb-medal .ge { left: 100%; top: 50%; background: linear-gradient(160deg, #bfe2ff, #3d6fe0); clip-path: polygon(25% 3%, 75% 3%, 100% 50%, 75% 97%, 25% 97%, 0 50%); }
+.cb-medal .gr { left: 50%; top: 100%; background: linear-gradient(160deg, #ffd9a0, #e8711a); clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
+.cb-medal .gc { left: 0; top: 50%; background: #b9bec4; border-radius: 50%; }
+.back-row { display: flex; flex-wrap: wrap; gap: 28px; align-items: flex-start; }
+.back-row figure { flex: 0 1 260px; }
+.back-row .notes { flex: 1 1 260px; max-width: 52ch; display: flex; flex-direction: column; gap: 10px; color: var(--muted); }
+.back-row .notes b { color: var(--fg); font-weight: 600; }
 
 @media (prefers-reduced-motion: reduce) {
   .card:not(.live) { animation: none; }
@@ -238,6 +293,37 @@ figcaption .v b { color: var(--fg); font-weight: 600; }
 
   <section>
     <div class="sec-head">
+      <h2>Pistes de nouvelles variantes</h2>
+      <p>Idées en plus, pas encore dans les taux. Montrées sur la carte Épique de Mathis. Si tu en gardes, je propose de prendre leurs chances sur les 88 % des cartes normales.</p>
+    </div>
+    <div class="grid" id="ideas"></div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <h2>Le dos des cartes</h2>
+      <p>Le même pour toutes les cartes, pour qu’on ne devine jamais la rareté avant de retourner la carte.</p>
+    </div>
+    <div class="back-row">
+      <figure>
+        <div class="card cardback" tabindex="0" role="button" aria-label="Dos de carte, agrandir">
+          <div class="cb"><div class="cb-rays"></div>
+            <div class="cb-inner"><span class="cb-top">Les Potes</span>
+              <div class="cb-medal"><i class="gl"></i><i class="ge"></i><i class="gr"></i><i class="gc"></i><b>S1</b></div>
+              <span class="cb-bottom">Saison 1 · 60 cartes</span></div></div>
+          <div class="fx sweep"></div><div class="fx glare"></div>
+        </div>
+        <figcaption><span class="k">Dos · Saison 1</span></figcaption>
+      </figure>
+      <div class="notes">
+        <p>Les couleurs reprennent celles du booster : violet profond et or. Au centre, le médaillon <b>S1</b> entouré des quatre gemmes de rareté, de la Légendaire en haut à la Commune à gauche.</p>
+        <p>Le reflet doré suit le doigt, comme sur les faces. À chaque nouvelle saison, il suffit de changer <b>S1</b> et le nombre de cartes.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
       <h2>Ce qu’il y a dans un booster</h2>
       <p>5 cartes, un booster toutes les 3 h. Les slots 1 à 3 sont surtout des communs, le slot 5 est toujours Rare ou mieux.</p>
     </div>
@@ -270,6 +356,12 @@ figcaption .v b { color: var(--fg); font-weight: 600; }
       info: "<b>3</b> cartes du set · 1 tous les <b>~14</b> boosters" },
   ];
   const DOTS = { common: "#9aa0a7", rare: "#f08a24", epic: "#3d63d6", legend: "#e2b13c" };
+  const IDEAS = [
+    { v: "signed", label: "Signée", info: "La signature du pote à la main, à l’encre dorée" },
+    { v: "polaroid", label: "Polaroid", info: "Photo carrée, tons vintage, texte écrit au feutre" },
+    { v: "comic", label: "BD", info: "Couleurs saturées, trame de points, gros contours" },
+    { v: "full signed", label: "Full art signée", info: "Les variantes peuvent se combiner pour les cartes graal" },
+  ];
   const VARIANTS = [
     { v: "normal", label: "Normale", info: "<b>88 %</b> des cartes · photo dans le cadre" },
     { v: "pixel", label: "Pixel art", info: "<b>7 %</b> · photo pixelisée, palette réduite" },
@@ -398,10 +490,10 @@ figcaption .v b { color: var(--fg); font-weight: 600; }
     let sparks = "";
     const R = rng(d.num.charCodeAt(2) * 31 + v.length);
     for (let i = 0; i < 7; i++) sparks += `<span style="left:${8 + R() * 80}%;top:${6 + R() * 84}%;animation-delay:${(R() * 2.6).toFixed(2)}s"></span>`;
-    return `<div class="card r-${d.r} v-${v}" tabindex="0" role="button" aria-label="${esc(d.name)}, ${esc(d.label)}, agrandir" data-scene="${d.scene}">
+    return `<div class="card r-${d.r} ${v.split(" ").map(x => "v-" + x).join(" ")}" tabindex="0" role="button" aria-label="${esc(d.name)}, ${esc(d.label)}, agrandir" data-scene="${d.scene}">
       <div class="frame">
         <div class="top"><span class="name">${esc(d.name)}</span><span class="gem"></span></div>
-        <div class="art"><img class="photo" alt="" src="${s.photo}"><img class="px" alt="" src="${s.px}"><div class="ribbon">${esc(d.title)}</div></div>
+        <div class="art"><img class="photo" alt="" src="${s.photo}"><img class="px" alt="" src="${s.px}"><div class="ribbon">${esc(d.title)}</div><span class="sign">${esc(d.name)}</span></div>
         <div class="ribbon">${esc(d.title)}</div>
         <p class="flavor">${esc(d.flavor)}</p>
         <div class="foot"><span>S1 · ${d.num}/060</span><span>${esc(d.place)}</span></div>
@@ -415,7 +507,9 @@ figcaption .v b { color: var(--fg); font-weight: 600; }
     const rare = CARDS[1];
     document.getElementById("variants").innerHTML = VARIANTS.map(x =>
       `<figure>${cardHTML(rare, x.v)}<figcaption><span class="k">${x.label}</span><span class="v">${x.info}</span></figcaption></figure>`).join("");
-    document.querySelectorAll("#rarities .card, #variants .card").forEach(bindTilt);
+    document.getElementById("ideas").innerHTML = IDEAS.map(x =>
+      `<figure>${cardHTML(CARDS[2], x.v)}<figcaption><span class="k">${x.label}</span><span class="v">${x.info}</span></figcaption></figure>`).join("");
+    document.querySelectorAll("#rarities .card, #variants .card, #ideas .card").forEach(bindTilt);
     const cc = document.getElementById("cropCards");
     cc.innerHTML = custom ? [["normal", "Normale"], ["full", "Full art"]].map(([v, l]) =>
       `<figure>${cardHTML(rare, v)}<figcaption><span class="k">${l}</span></figcaption></figure>`).join("") : "";
@@ -506,6 +600,7 @@ figcaption .v b { color: var(--fg); font-weight: 600; }
     reset.hidden = true; hint.hidden = true; cadrage.hidden = true; input.value = "";
   });
 
+  bindTilt(document.querySelector(".cardback"));
   makeSources();
   render();
   applyCrop();
