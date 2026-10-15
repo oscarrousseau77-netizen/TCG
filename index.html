@@ -7,7 +7,8 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;1,500&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600&family=Silkscreen&family=Caveat:wght@700&family=Bangers&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&text=%E3%83%89%E3%83%B3!&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;1,500&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600&family=Silkscreen&family=Bangers&display=swap">
 <style>
 /* Mise en page : un classeur de collection la nuit. Cartes en vedette sur fond sombre, une rangée par sujet (raretés, puis variantes). */
 :root {
@@ -21,7 +22,6 @@
   --f-body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
   --f-card: "Barlow Condensed", "Arial Narrow", system-ui, sans-serif;
   --f-pixel: "Silkscreen", ui-monospace, monospace;
-  --f-hand: "Caveat", "Segoe Print", "Bradley Hand", cursive;
   --f-comic: "Bangers", "Impact", "Arial Black", sans-serif;
   color-scheme: dark;
 }
@@ -55,6 +55,9 @@ section { display: flex; flex-direction: column; gap: 22px; }
 .sec-head p { color: var(--muted); }
 
 .grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 32px 28px; }
+.grid.five { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 32px 20px; }
+@media (max-width: 1000px) { .grid.five { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 780px) { .grid.five { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 16px; } }
 @media (max-width: 780px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 16px; } }
 figure { margin: 0; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
 figcaption { display: flex; flex-direction: column; gap: 3px; }
@@ -68,7 +71,7 @@ figcaption .v b { color: var(--fg); font-weight: 600; }
   --rx: 0deg; --ry: 0deg;
   container-type: inline-size;
   position: relative; width: 100%; max-width: 100%; aspect-ratio: 63 / 88;
-  border-radius: 4.5cqw; cursor: zoom-in; touch-action: pan-y;
+  border-radius: 4.5% / 3.22%; cursor: zoom-in; touch-action: pan-y;
   transform: perspective(900px) rotateX(var(--ry)) rotateY(var(--rx));
   transition: transform .25s ease-out, box-shadow .25s;
   box-shadow: 0 10px 28px rgba(0,0,0,.45), 0 2px 6px rgba(0,0,0,.4);
@@ -162,31 +165,27 @@ figcaption .v b { color: var(--fg); font-weight: 600; }
 .v-gold .sparks { display: block; }
 .v-gold .sparks span { background: #fff4c4; }
 
-/* Pistes : signée, polaroid, BD */
-.sign { display: none; }
-.v-signed .sign { display: block; position: absolute; z-index: 2; right: 5cqw; bottom: 8cqw; font: 700 15cqw/1 var(--f-hand); color: #ffe08a;
-  transform: rotate(-9deg); text-shadow: 0 .3cqw 0 #7a520c, 0 0 2cqw rgba(0,0,0,.55); }
-.v-signed .foil { opacity: .14; }
-.v-full.v-signed .sign { bottom: auto; top: 34%; right: 7cqw; }
-
-.v-polaroid { border-radius: 1.6cqw; --flat: #f3efe4; }
-.v-polaroid .frame { background: linear-gradient(170deg, #fbf8f0, #ece6d6); padding: 5cqw 5cqw 3.4cqw; }
-.v-polaroid .top { order: 2; background: none; padding: 0 1cqw; color: #2a2620; }
-.v-polaroid .name { font: 700 10cqw/1 var(--f-hand); text-transform: none; }
-.v-polaroid .art { order: 1; border-radius: 0; box-shadow: inset 0 0 0 1px rgba(0,0,0,.15); aspect-ratio: 1 / 1; }
-.v-polaroid .art img { filter: sepia(.3) saturate(.85) contrast(.95) brightness(1.06); }
-.v-polaroid .art .ribbon { display: none; }
-.v-polaroid .flavor { order: 3; background: none; color: #4a443a; font: 700 6cqw/1.1 var(--f-hand); padding: 0 1cqw; }
-.v-polaroid .foot { order: 4; color: #8a8270; }
-
-.v-comic .art::after { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; mix-blend-mode: multiply;
-  background: radial-gradient(circle, rgba(0,0,0,.4) 28%, transparent 31%) 0 0 / 2.2cqw 2.2cqw; }
-.v-comic .art { box-shadow: 0 0 0 .9cqw #111; }
-.v-comic .art img { filter: contrast(1.5) saturate(1.7); }
-.v-comic .top, .v-comic .flavor { border: .9cqw solid #111; }
-.v-comic .name { font: 400 10cqw/1 var(--f-comic); letter-spacing: .04em; }
-.v-comic .ribbon { background: #ffe14d; color: #111; font: 400 6cqw/1.1 var(--f-comic); letter-spacing: .04em; border-top: .9cqw solid #111; }
-.v-comic .flavor { background: #fff; color: #111; font-weight: 600; border-radius: 4cqw; }
+/* Manga */
+.sfx { display: none; }
+.v-manga .frame { background: #fbfbf8; box-shadow: inset 0 0 0 1.2cqw #111; }
+.v-manga .top { background: #111; color: #fff; border-radius: 0; transform: skewX(-6deg); }
+.v-manga .name { font: 400 9.5cqw/1 var(--f-comic); letter-spacing: .05em; }
+.v-manga .art { border-radius: 0; box-shadow: none; clip-path: polygon(0 7%, 100% 0, 100% 100%, 0 100%); background: #fff; }
+.v-manga .art img { filter: grayscale(1) contrast(1.9) brightness(1.1); }
+.v-manga .art::before { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: repeating-conic-gradient(from 0deg at 50% 42%, rgba(0,0,0,.6) 0 .8deg, transparent .8deg 6deg);
+  -webkit-mask-image: radial-gradient(circle at 50% 42%, transparent 34%, #000 62%); mask-image: radial-gradient(circle at 50% 42%, transparent 34%, #000 62%); }
+.v-manga .art::after { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; mix-blend-mode: multiply;
+  background: radial-gradient(circle, rgba(0,0,0,.28) 26%, transparent 30%) 0 0 / 1.8cqw 1.8cqw; }
+.v-manga .art .ribbon { background: #fff; color: #111; border-top: .9cqw solid #111; font: 400 5.6cqw/1.1 var(--f-comic); letter-spacing: .05em; }
+.v-manga .sfx { display: block; position: absolute; z-index: 2; top: 9cqw; right: 4cqw; font: 400 14cqw/1 "Dela Gothic One", var(--f-comic);
+  color: #fff; -webkit-text-stroke: 1cqw #111; paint-order: stroke fill; transform: rotate(10deg); }
+.v-manga .flavor { background: #fff; color: #111; font-weight: 600; border: .8cqw solid #111; border-radius: 50%; overflow: visible;
+  display: flex; align-items: center; justify-content: center; text-align: center; padding: 2cqw 9cqw; margin-top: 2cqw; }
+.v-manga .flavor::before { content: ""; position: absolute; top: -4.2cqw; left: 24%; width: 6cqw; height: 5cqw; background: #111; clip-path: polygon(0 0, 100% 100%, 20% 100%); }
+.v-manga .flavor::after { content: ""; position: absolute; top: -2.4cqw; left: calc(24% + 1.2cqw); width: 4cqw; height: 3.6cqw; background: #fff; clip-path: polygon(0 0, 100% 100%, 20% 100%); }
+.v-manga .foot { color: #111; }
+.v-manga .glare { opacity: .2; }
 
 /* ---------- Dos de carte ---------- */
 .cardback { --glare: .55; }
@@ -286,17 +285,9 @@ figcaption .v b { color: var(--fg); font-weight: 600; }
   <section>
     <div class="sec-head">
       <h2>Les variantes</h2>
-      <p>Tirées à part, sur chaque carte, quelle que soit sa rareté. Ici la même carte Rare dans ses quatre versions : chacune compte comme une carte de collection différente.</p>
+      <p>Tirées à part, sur chaque carte, quelle que soit sa rareté. Ici la même carte Rare dans ses cinq versions : chacune compte comme une carte de collection différente.</p>
     </div>
-    <div class="grid" id="variants"></div>
-  </section>
-
-  <section>
-    <div class="sec-head">
-      <h2>Pistes de nouvelles variantes</h2>
-      <p>Idées en plus, pas encore dans les taux. Montrées sur la carte Épique de Mathis. Si tu en gardes, je propose de prendre leurs chances sur les 88 % des cartes normales.</p>
-    </div>
-    <div class="grid" id="ideas"></div>
+    <div class="grid five" id="variants"></div>
   </section>
 
   <section>
@@ -356,16 +347,11 @@ figcaption .v b { color: var(--fg); font-weight: 600; }
       info: "<b>3</b> cartes du set · 1 tous les <b>~14</b> boosters" },
   ];
   const DOTS = { common: "#9aa0a7", rare: "#f08a24", epic: "#3d63d6", legend: "#e2b13c" };
-  const IDEAS = [
-    { v: "signed", label: "Signée", info: "La signature du pote à la main, à l’encre dorée" },
-    { v: "polaroid", label: "Polaroid", info: "Photo carrée, tons vintage, texte écrit au feutre" },
-    { v: "comic", label: "BD", info: "Couleurs saturées, trame de points, gros contours" },
-    { v: "full signed", label: "Full art signée", info: "Les variantes peuvent se combiner pour les cartes graal" },
-  ];
   const VARIANTS = [
-    { v: "normal", label: "Normale", info: "<b>88 %</b> des cartes · photo dans le cadre" },
+    { v: "normal", label: "Normale", info: "<b>84 %</b> des cartes · photo dans le cadre" },
     { v: "pixel", label: "Pixel art", info: "<b>7 %</b> · photo pixelisée, palette réduite" },
     { v: "full", label: "Full art", info: "<b>4 %</b> · photo plein cadre, texte par-dessus" },
+    { v: "manga", label: "Manga", info: "<b>4 %</b> · noir et blanc, trame, lignes de vitesse, bulle" },
     { v: "gold", label: "Dorée à reflet", info: "<b>1 %</b> · cadre doré, reflet qui suit le mouvement" },
   ];
 
@@ -493,7 +479,7 @@ figcaption .v b { color: var(--fg); font-weight: 600; }
     return `<div class="card r-${d.r} ${v.split(" ").map(x => "v-" + x).join(" ")}" tabindex="0" role="button" aria-label="${esc(d.name)}, ${esc(d.label)}, agrandir" data-scene="${d.scene}">
       <div class="frame">
         <div class="top"><span class="name">${esc(d.name)}</span><span class="gem"></span></div>
-        <div class="art"><img class="photo" alt="" src="${s.photo}"><img class="px" alt="" src="${s.px}"><div class="ribbon">${esc(d.title)}</div><span class="sign">${esc(d.name)}</span></div>
+        <div class="art"><img class="photo" alt="" src="${s.photo}"><img class="px" alt="" src="${s.px}"><div class="ribbon">${esc(d.title)}</div><span class="sfx" aria-hidden="true">ドン!</span></div>
         <div class="ribbon">${esc(d.title)}</div>
         <p class="flavor">${esc(d.flavor)}</p>
         <div class="foot"><span>S1 · ${d.num}/060</span><span>${esc(d.place)}</span></div>
@@ -507,9 +493,7 @@ figcaption .v b { color: var(--fg); font-weight: 600; }
     const rare = CARDS[1];
     document.getElementById("variants").innerHTML = VARIANTS.map(x =>
       `<figure>${cardHTML(rare, x.v)}<figcaption><span class="k">${x.label}</span><span class="v">${x.info}</span></figcaption></figure>`).join("");
-    document.getElementById("ideas").innerHTML = IDEAS.map(x =>
-      `<figure>${cardHTML(CARDS[2], x.v)}<figcaption><span class="k">${x.label}</span><span class="v">${x.info}</span></figcaption></figure>`).join("");
-    document.querySelectorAll("#rarities .card, #variants .card, #ideas .card").forEach(bindTilt);
+    document.querySelectorAll("#rarities .card, #variants .card").forEach(bindTilt);
     const cc = document.getElementById("cropCards");
     cc.innerHTML = custom ? [["normal", "Normale"], ["full", "Full art"]].map(([v, l]) =>
       `<figure>${cardHTML(rare, v)}<figcaption><span class="k">${l}</span></figcaption></figure>`).join("") : "";
