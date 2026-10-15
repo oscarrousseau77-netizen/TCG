@@ -318,9 +318,10 @@ header { display: flex; justify-content: space-between; align-items: center; gap
     { common: 80, rare: 18, epic: 2, legend: 0 },
     { common: 50, rare: 40, epic: 9, legend: 1 },
   ];
-  const VAR_RATES = { normal: 84, pixel: 7, full: 4, manga: 4, gold: 1 };
-  /* ?variante=manga (ou pixel, full, gold) force la variante des cartes tirées, pour tester */
-  const FORCE_V = (() => { try { const v = new URLSearchParams(location.search).get("variante"); return v in VAR_RATES ? v : null; } catch (e) { return null; } })();
+  /* Seule variante : full art, 5 % de chance, uniquement sur les Épiques et Légendaires */
+  const FULL_ART_RATE = 5, FULL_ART_RARITIES = ["epic", "legend"];
+  /* ?variante=full force le full art sur les Épiques et Légendaires tirées, pour tester */
+  const FORCE_FULL = (() => { try { return new URLSearchParams(location.search).get("variante") === "full"; } catch (e) { return false; } })();
   const pick = table => { let x = Math.random() * 100; for (const k in table) { if ((x -= table[k]) < 0) return k; } return Object.keys(table)[0]; };
 
   /* ---------- Photos d'exemple dessinées (reprises de la maquette) ---------- */
@@ -444,7 +445,7 @@ header { display: flex; justify-content: space-between; align-items: center; gap
       let r = pick(rates), opts = POOL[r].filter(c => !used.has(c.num));
       if (!opts.length) { r = "common"; opts = POOL.common.filter(c => !used.has(c.num)); }
       const base = opts[Math.floor(Math.random() * opts.length)]; used.add(base.num);
-      cards.push({ ...base, r, v: FORCE_V || pick(VAR_RATES), ...sceneSrc(base.scene) });
+      cards.push({ ...base, r, v: FULL_ART_RARITIES.includes(r) && (FORCE_FULL || Math.random() * 100 < FULL_ART_RATE) ? "full" : "normal", ...sceneSrc(base.scene) });
     });
     cards.push({ ...DJ });
     return cards;
@@ -470,7 +471,7 @@ header { display: flex; justify-content: space-between; align-items: center; gap
   }
   function buildPile() {
     pile.innerHTML = cards.map((c, k) => `<div class="slotc r-${c.r}" style="z-index:${10 - k}; --c:${COLOR[c.r]}">
-      <div class="label">${RAR[c.r]}${c.v !== "normal" ? " · " + { pixel: "Pixel art", full: "Full art", manga: "Manga", gold: "Dorée" }[c.v] : ""}</div>
+      <div class="label">${RAR[c.r]}${c.v !== "normal" ? " · " + "Full art" : ""}</div>
       <div class="inner"><div class="face back"><div class="card cardback"><div class="cb"><div class="cb-rays"></div><div class="cb-inner"><span class="cb-top">Les Potes</span><div class="cb-medal"><i class="gl"></i><i class="ge"></i><i class="gr"></i><i class="gc"></i><b>S1</b></div><span class="cb-bottom">Saison 1 · 60 cartes</span></div></div><div class="fx sweep"></div><div class="fx glare"></div></div><div class="aura"></div></div><div class="face front">${cardHTML(c)}</div></div></div>`).join("");
     slots = [...pile.children];
     slots.forEach((s, k) => { s.style.transform = `translate(${k * 3}px, ${k * 4}px)`; s.querySelector(".inner").style.transitionDuration = ""; });
