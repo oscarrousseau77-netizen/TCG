@@ -15,7 +15,7 @@ La maquette des cartes tient dans un seul fichier : `index.html`.
 | Tu veux changer | Cherche |
 |---|---|
 | Les couleurs d'une rareté (cadre, plaques, gemme) | `.r-common`, `.r-rare`, `.r-epic`, `.r-legend` |
-| Les variantes pixel art, full art, dorée | `.v-pixel`, `.v-full`, `.v-gold` |
+| La variante full art (Épiques et Légendaires) | `.v-full` |
 | Les reflets et effets | `.glare`, `.sweep`, `.foil`, `.sparks` |
 | Les cartes d'exemple (noms, titres, textes, lieux) | `const CARDS` dans le script |
 | Les polices | `--f-display`, `--f-card`, `--f-pixel` en haut du style |
