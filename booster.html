@@ -83,19 +83,14 @@ header { display: flex; justify-content: space-between; align-items: center; gap
 .face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
 .face.front { transform: rotateY(180deg); }
 /* Conteneur de la carte : ses arrondis (cqw) se calculent sur sa propre largeur */
-.face.front, .recap .row > div { container-type: inline-size; }
+.face.front, .face.back, .recap .row > div { container-type: inline-size; }
 
 /* Dos de carte */
-.back { border-radius: calc(var(--cw) * .045); overflow: hidden; box-shadow: 0 10px 28px rgba(0,0,0,.5);
-  background: radial-gradient(circle at 50% 50%, #3a2a6e, #1a1233 70%); border: calc(var(--cw) * .035) solid #ece8f4; display: grid; place-items: center; }
-.back::before { content: ""; position: absolute; inset: 6%; border-radius: calc(var(--cw) * .025); border: 2px solid rgba(242,193,78,.5);
-  background: repeating-linear-gradient(45deg, rgba(255,255,255,.04) 0 8px, transparent 8px 16px), repeating-linear-gradient(-45deg, rgba(255,255,255,.04) 0 8px, transparent 8px 16px); }
-.back b { position: relative; font: 800 calc(var(--cw) * .2)/1 var(--f-display); color: var(--accent); letter-spacing: -.03em; transform: rotate(-12deg);
-  text-shadow: 0 4px 0 #6b2fa3; }
-.back .aura { position: absolute; inset: -2px; border-radius: inherit; opacity: 0; box-shadow: inset 0 0 calc(var(--cw) * .12) var(--c); transition: opacity .4s; }
+.back { border-radius: calc(var(--cw) * .045); }
+.back .aura { position: absolute; inset: 0; z-index: 4; pointer-events: none; border-radius: inherit; opacity: 0; box-shadow: inset 0 0 calc(var(--cw) * .12) var(--c); transition: opacity .4s; }
 .slotc.tease .back { animation: tease .16s linear infinite; }
 .slotc.tease .back .aura, .slotc.glow .back .aura { opacity: 1; }
-.slotc.glow .back { box-shadow: 0 0 calc(var(--cw) * .12) var(--c), 0 10px 28px rgba(0,0,0,.5); }
+.slotc.glow .back .card { box-shadow: 0 0 calc(var(--cw) * .12) var(--c), 0 10px 28px rgba(0,0,0,.5); }
 @keyframes tease { 0%, 100% { transform: translate(0, 0) rotate(0); } 25% { transform: translate(-2px, 1px) rotate(-.6deg); } 75% { transform: translate(2px, -1px) rotate(.6deg); } }
 
 /* Éclat derrière la carte révélée */
@@ -209,6 +204,29 @@ header { display: flex; justify-content: space-between; align-items: center; gap
 .v-gold .foil { opacity: .1; }
 .v-gold .sparks { display: block; }
 .v-gold .sparks span { background: #fff4c4; }
+
+/* ---------- Dos de carte (repris de la maquette) ---------- */
+.cardback { --glare: .55; }
+.cardback .sweep { display: block; background: linear-gradient(110deg, transparent 40%, rgba(255,233,168,.45) 49%, rgba(255,255,255,.75) 50%, rgba(255,233,168,.45) 51%, transparent 60%); background-size: 260% 100%; }
+.cb { position: absolute; inset: 0; border-radius: inherit; overflow: hidden; background: #ece8f4; }
+.cb-rays { position: absolute; inset: 3.2cqw; border-radius: 3cqw;
+  background: repeating-conic-gradient(from 0deg at 50% 47%, rgba(242,193,78,.14) 0 5deg, transparent 5deg 15deg),
+              radial-gradient(circle at 50% 47%, #7a37b0, #2b1a55 52%, #150c2c); }
+.cb-inner { position: absolute; inset: 6.4cqw; border-radius: 2cqw; border: .6cqw solid rgba(242,193,78,.8);
+  display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 6cqw 3cqw 5cqw; text-align: center; }
+.cb-inner::before { content: ""; position: absolute; inset: 1.6cqw; border-radius: 1.2cqw; border: .3cqw solid rgba(242,193,78,.4); pointer-events: none; }
+.cb-top { font: 700 9cqw/1 var(--f-card); letter-spacing: .24em; text-transform: uppercase; color: #ffe9a8; padding-left: .24em; }
+.cb-bottom { font: 600 4.6cqw/1 var(--f-card); letter-spacing: .2em; text-transform: uppercase; color: rgba(255,233,168,.78); padding-left: .2em; }
+.cb-medal { position: relative; width: 54cqw; aspect-ratio: 1; border-radius: 50%; display: grid; place-items: center;
+  background: radial-gradient(circle at 40% 35%, #43307d, #1a1233 72%);
+  box-shadow: 0 0 0 1cqw #f2c14e, 0 0 0 2.2cqw #2b1a55, 0 0 0 2.8cqw rgba(242,193,78,.6), 0 0 10cqw rgba(242,193,78,.35); }
+.cb-medal b { font: 800 22cqw/1 var(--f-display); color: #f2c14e; letter-spacing: -.03em; transform: rotate(-10deg); text-shadow: 0 1.2cqw 0 #b2367e; }
+.cb-medal i { position: absolute; width: 9cqw; height: 9cqw; transform: translate(-50%, -50%); filter: drop-shadow(0 0 1cqw rgba(0,0,0,.6)); }
+.cb-medal .gl { left: 50%; top: 0; background: radial-gradient(circle at 35% 30%, #fffbe6, #f2c14e 45%, #a8761c);
+  clip-path: polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); width: 11cqw; height: 11cqw; }
+.cb-medal .ge { left: 100%; top: 50%; background: linear-gradient(160deg, #bfe2ff, #3d6fe0); clip-path: polygon(25% 3%, 75% 3%, 100% 50%, 75% 97%, 25% 97%, 0 50%); }
+.cb-medal .gr { left: 50%; top: 100%; background: linear-gradient(160deg, #ffd9a0, #e8711a); clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
+.cb-medal .gc { left: 0; top: 50%; background: #b9bec4; border-radius: 50%; }
 
 @media (prefers-reduced-motion: reduce) {
   .card:not(.live), .pack, .pack .shine, .burst.stay { animation: none !important; }
@@ -427,7 +445,7 @@ header { display: flex; justify-content: space-between; align-items: center; gap
   function buildPile() {
     pile.innerHTML = cards.map((c, k) => `<div class="slotc r-${c.r}" style="z-index:${10 - k}; --c:${COLOR[c.r]}">
       <div class="label">${RAR[c.r]}${c.v !== "normal" ? " · " + { pixel: "Pixel art", full: "Full art", gold: "Dorée" }[c.v] : ""}</div>
-      <div class="inner"><div class="face back"><div class="aura"></div><b>S1</b></div><div class="face front">${cardHTML(c)}</div></div></div>`).join("");
+      <div class="inner"><div class="face back"><div class="card cardback"><div class="cb"><div class="cb-rays"></div><div class="cb-inner"><span class="cb-top">Les Potes</span><div class="cb-medal"><i class="gl"></i><i class="ge"></i><i class="gr"></i><i class="gc"></i><b>S1</b></div><span class="cb-bottom">Saison 1 · 60 cartes</span></div></div><div class="fx sweep"></div><div class="fx glare"></div></div><div class="aura"></div></div><div class="face front">${cardHTML(c)}</div></div></div>`).join("");
     slots = [...pile.children];
     slots.forEach((s, k) => { s.style.transform = `translate(${k * 3}px, ${k * 4}px)`; s.querySelector(".inner").style.transitionDuration = ""; });
     pile.querySelectorAll(".card").forEach(bindTilt);
