@@ -23,7 +23,7 @@
   --f-card: "Barlow Condensed", "Arial Narrow", system-ui, sans-serif;
   --f-pixel: "Silkscreen", ui-monospace, monospace;
   --f-comic: "Bangers", "Impact", "Arial Black", sans-serif;
-  --cw: min(76vw, 330px, calc((100dvh - 190px) * 63 / 88));
+  --cw: min(90vw, 460px, calc((100dvh - 160px) * 63 / 88));
   color-scheme: dark;
 }
 @property --mx { syntax: "<percentage>"; inherits: true; initial-value: 50%; }
@@ -74,18 +74,28 @@ header { display: flex; justify-content: space-between; align-items: center; gap
 @keyframes shake { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-4deg) translateX(-4px); } 75% { transform: rotate(4deg) translateX(4px); } }
 
 /* ---------- Pile de cartes ---------- */
-.pile { position: absolute; width: var(--cw); aspect-ratio: 63 / 88; }
+.pile { position: absolute; width: var(--cw); aspect-ratio: 63 / 88; translate: 0 -3%; }
 .slotc { position: absolute; inset: 0; perspective: 1400px; transition: transform .5s cubic-bezier(.4,0,.6,1), opacity .5s; }
 .slotc.rise { animation: rise .7s cubic-bezier(.2,.9,.3,1.1) both; }
 @keyframes rise { from { transform: translateY(55%) scale(.9); opacity: 0; } }
 .slotc.gone-r { transform: translate(115vw, -8%) rotate(24deg); }
 .slotc.gone-l { transform: translate(-115vw, -8%) rotate(-24deg); }
-.inner { position: absolute; inset: 0; transform-style: preserve-3d; transition: transform .75s cubic-bezier(.3,.1,.2,1); }
+.inner { position: absolute; inset: 0; transform-style: preserve-3d; transition: transform .7s cubic-bezier(.45,0,.55,1); }
 .slotc.revealed .inner { transform: rotateY(180deg); }
 .face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
 .face.front { transform: rotateY(180deg); }
+/* On échange les faces pile à mi-rotation (carte de profil) : certains navigateurs mobiles ignorent backface-visibility
+   quand la face contient elle-même une transformation 3D, et montraient le dos à la place de la face. */
+.face.back { transition: visibility 0s linear .35s; }
+.face.front { visibility: hidden; transition: visibility 0s linear .35s; }
+.slotc.revealed .face.back { visibility: hidden; }
+.slotc.revealed .face.front { visibility: visible; }
+/* Pas de transformation 3D propre aux cartes pendant le retournement (sinon le dos reste affiché à plat) : l'inclinaison revient une fois la carte posée. */
+.face .card { transform: none; animation: none; }
+.slotc.settled .face.front .card { transform: perspective(900px) rotateX(var(--ry)) rotateY(var(--rx)); }
+.slotc.settled .face.front .card:not(.live) { animation: drift var(--drift, 7s) ease-in-out infinite; }
 /* Conteneur de la carte : ses arrondis (cqw) se calculent sur sa propre largeur */
-.face.front, .face.back, .recap .row > div { container-type: inline-size; }
+.pile, .recap .row > div { container-type: inline-size; }
 
 /* Dos de carte */
 .back { border-radius: calc(var(--cw) * .045); }
@@ -475,7 +485,7 @@ header { display: flex; justify-content: space-between; align-items: center; gap
       <div class="inner"><div class="face back"><div class="card cardback"><div class="cb"><div class="cb-rays"></div><div class="cb-inner"><span class="cb-top">Les Potes</span><div class="cb-medal"><i class="gl"></i><i class="ge"></i><i class="gr"></i><i class="gc"></i><b>S1</b></div><span class="cb-bottom">Saison 1 · 60 cartes</span></div></div><div class="fx sweep"></div><div class="fx glare"></div></div><div class="aura"></div></div><div class="face front">${cardHTML(c)}</div></div></div>`).join("");
     slots = [...pile.children];
     slots.forEach((s, k) => { s.style.transform = `translate(${k * 3}px, ${k * 4}px)`; s.querySelector(".inner").style.transitionDuration = ""; });
-    pile.querySelectorAll(".card").forEach(bindTilt);
+    pile.querySelectorAll(".face.front .card").forEach(bindTilt);
   }
 
   async function advance() {
@@ -485,7 +495,9 @@ header { display: flex; justify-content: space-between; align-items: center; gap
       if (state === "pack") {
         pack.classList.add("shake"); await wait(700);
         pack.classList.add("open"); say("");
-        buildPile(); pile.hidden = false;
+        buildPile();
+        await Promise.all([...pile.querySelectorAll("img")].map(im => im.decode().catch(() => {})));
+        pile.hidden = false;
         slots.forEach((s, k) => { s.classList.add("rise"); s.style.animationDelay = (.25 + k * .06) + "s"; });
         await wait(1100);
         slots.forEach(s => { s.classList.remove("rise"); s.style.animationDelay = ""; });
@@ -500,6 +512,7 @@ header { display: flex; justify-content: space-between; align-items: center; gap
           if (last) { say("Dernière carte…"); s.classList.add("tease"); await wait(1300); s.classList.remove("tease"); }
           if (high) { s.classList.add("glow"); await wait(last ? 350 : 450); }
           s.classList.add("revealed");
+          setTimeout(() => s.classList.add("settled"), 750);
           await wait(380);
           if (high) { burst.style.setProperty("--c", COLOR[c.r]); burst.className = "burst"; void burst.offsetWidth; burst.className = "burst on"; }
           if (c.r === "legend" || c.v === "gold") { await wait(900); burst.className = "burst stay"; }
