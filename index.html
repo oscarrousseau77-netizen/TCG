@@ -113,11 +113,24 @@ figcaption .v b { color: var(--fg); font-weight: 600; }
 .r-rare { --dot: #f08a24; --frame: linear-gradient(160deg, #ffb866, #ec7a1f 50%, #b9520a);
   --plate: #fff3e6; --plate-ink: #4d2405; --gem: linear-gradient(160deg, #ffd9a0, #e8711a); --gem-shape: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
   --ribbon: #b9520a; --art-edge: #8f3f06; --foot-ink: #3d1c03; --glare: .45; }
-.r-epic { --dot: #3d63d6; --frame: linear-gradient(160deg, #3556c0, #142c74 50%, #0a1640);
-  --plate: #15235a; --plate-ink: #e8eeff; --gem: linear-gradient(160deg, #bfe2ff, #3d6fe0); --gem-shape: polygon(25% 3%, 75% 3%, 100% 50%, 75% 97%, 25% 97%, 0 50%);
-  --ribbon: #0a1745; --art-edge: #0a1745; --foot-ink: #c9d6ff; --glare: .5; }
-.r-epic .sweep { display: block; }
+/* Épique : violet électrique, halo qui tourne et qui pulse (clair et vif, pour ne pas ressembler au dos violet sombre et or) */
+.r-epic { --dot: #a855f7; --frame: linear-gradient(155deg, #f3e8ff, #c084fc 16%, #8b2cf5 38%, #5b16c9 55%, #b46cff 76%, #e9d5ff 96%);
+  --plate: #f7f0ff; --plate-ink: #3b0a6b; --gem: linear-gradient(160deg, #fdf0ff, #d946ef 50%, #7c3aed); --gem-shape: polygon(25% 3%, 75% 3%, 100% 50%, 75% 97%, 25% 97%, 0 50%);
+  --ribbon: linear-gradient(90deg, #5b16c9, #a21caf); --art-edge: #4c1d95; --foot-ink: #2e0854; --glare: .6; }
+.r-epic::before { content: ""; position: absolute; inset: -3px; z-index: -1; border-radius: inherit; pointer-events: none;
+  background: conic-gradient(from var(--spin), #f0abfc, #8b2cf5, #22d3ee, #a855f7, #f472b6, #f0abfc); filter: blur(5px);
+  animation: epic-spin 3.2s linear infinite; }
+.r-epic:not(.live) { animation: drift var(--drift, 7s) ease-in-out infinite, epic-pulse 2.4s ease-in-out infinite; }
+.r-epic.live { animation: epic-pulse 2.4s ease-in-out infinite; }
+.r-epic .sweep { display: block; background: linear-gradient(105deg, transparent 36%, rgba(240,171,252,.45) 46%, rgba(255,255,255,.85) 50%, rgba(165,243,252,.45) 54%, transparent 64%);
+  background-size: 260% 100%; }
 .r-epic .sparks { display: block; }
+.r-epic .sparks span { background: #f5e1ff; filter: drop-shadow(0 0 1.2cqw #d946ef); }
+@property --spin { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+@keyframes epic-spin { to { --spin: 360deg; } }
+@keyframes epic-pulse {
+  0%, 100% { box-shadow: 0 10px 28px rgba(0,0,0,.45), 0 0 18px rgba(168,85,247,.45); }
+  50% { box-shadow: 0 10px 28px rgba(0,0,0,.45), 0 0 34px rgba(217,70,239,.75); } }
 .r-legend { --dot: #e2b13c; --frame: linear-gradient(140deg, #fff3bf, #e5b440 22%, #9c6c17 45%, #f7d66e 68%, #b8862b 88%, #fff0b0);
   --plate: #fff8e2; --plate-ink: #3f2b03; --gem: radial-gradient(circle at 35% 30%, #fffbe6, #f2c14e 45%, #a8761c); --gem-shape: polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
   --ribbon: linear-gradient(90deg, #7a520c, #b8862b, #7a520c); --art-edge: #8a5f12; --foot-ink: #3a2803; --glare: .65; --drift: 5s; }
@@ -136,9 +149,37 @@ figcaption .v b { color: var(--fg); font-weight: 600; }
 .v-full .foot { order: 5; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,.8); }
 .v-full .glare { opacity: .45; }
 
+/* ---------- Dos de carte ---------- */
+.cardback { --glare: .55; }
+.cardback .sweep { display: block; background: linear-gradient(110deg, transparent 40%, rgba(255,233,168,.45) 49%, rgba(255,255,255,.75) 50%, rgba(255,233,168,.45) 51%, transparent 60%); background-size: 260% 100%; }
+.cb { position: absolute; inset: 0; border-radius: inherit; overflow: hidden; background: #ece8f4; }
+.cb-rays { position: absolute; inset: 3.2cqw; border-radius: 3cqw;
+  background: repeating-conic-gradient(from 0deg at 50% 47%, rgba(242,193,78,.14) 0 5deg, transparent 5deg 15deg),
+              radial-gradient(circle at 50% 47%, #7a37b0, #2b1a55 52%, #150c2c); }
+.cb-inner { position: absolute; inset: 6.4cqw; border-radius: 2cqw; border: .6cqw solid rgba(242,193,78,.8);
+  display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 6cqw 3cqw 5cqw; text-align: center; }
+.cb-inner::before { content: ""; position: absolute; inset: 1.6cqw; border-radius: 1.2cqw; border: .3cqw solid rgba(242,193,78,.4); pointer-events: none; }
+.cb-top { font: 700 9cqw/1 var(--f-card); letter-spacing: .24em; text-transform: uppercase; color: #ffe9a8; padding-left: .24em; }
+.cb-bottom { font: 600 4.6cqw/1 var(--f-card); letter-spacing: .2em; text-transform: uppercase; color: rgba(255,233,168,.78); padding-left: .2em; }
+.cb-medal { position: relative; width: 54cqw; aspect-ratio: 1; border-radius: 50%; display: grid; place-items: center;
+  background: radial-gradient(circle at 40% 35%, #43307d, #1a1233 72%);
+  box-shadow: 0 0 0 1cqw #f2c14e, 0 0 0 2.2cqw #2b1a55, 0 0 0 2.8cqw rgba(242,193,78,.6), 0 0 10cqw rgba(242,193,78,.35); }
+.cb-medal b { font: 800 22cqw/1 var(--f-display); color: #f2c14e; letter-spacing: -.03em; transform: rotate(-10deg); text-shadow: 0 1.2cqw 0 #b2367e; }
+.cb-medal i { position: absolute; width: 9cqw; height: 9cqw; transform: translate(-50%, -50%); filter: drop-shadow(0 0 1cqw rgba(0,0,0,.6)); }
+.cb-medal .gl { left: 50%; top: 0; background: radial-gradient(circle at 35% 30%, #fffbe6, #f2c14e 45%, #a8761c);
+  clip-path: polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); width: 11cqw; height: 11cqw; }
+.cb-medal .ge { left: 100%; top: 50%; background: linear-gradient(160deg, #fdf0ff, #d946ef 50%, #7c3aed); clip-path: polygon(25% 3%, 75% 3%, 100% 50%, 75% 97%, 25% 97%, 0 50%); }
+.cb-medal .gr { left: 50%; top: 100%; background: linear-gradient(160deg, #ffd9a0, #e8711a); clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
+.cb-medal .gc { left: 0; top: 50%; background: #b9bec4; border-radius: 50%; }
+.back-row { display: flex; flex-wrap: wrap; gap: 28px; align-items: flex-start; }
+.back-row figure { flex: 0 1 260px; }
+.back-row .notes { flex: 1 1 260px; max-width: 52ch; display: flex; flex-direction: column; gap: 10px; color: var(--muted); }
+.back-row .notes b { color: var(--fg); font-weight: 600; }
+
 @media (prefers-reduced-motion: reduce) {
   .card:not(.live) { animation: none; }
   .sparks span { animation: none; opacity: .6; }
+  .r-epic, .r-epic::before { animation: none !important; }
   .card { transition: none; }
 }
 
@@ -199,7 +240,7 @@ figcaption .v b { color: var(--fg); font-weight: 600; }
   <section>
     <div class="sec-head">
       <h2>Les 4 raretés</h2>
-      <p>Un commun reste mat. Le rare prend un léger reflet, l’épique un éclat bleu qui balaie la carte, et le légendaire un foil holographique doré avec des étincelles.</p>
+      <p>Un commun reste mat. Le rare prend un léger reflet, l’épique passe au violet électrique, avec un halo qui tourne et pulse autour de la carte, et le légendaire un foil holographique doré avec des étincelles.</p>
     </div>
     <div class="grid" id="rarities"></div>
   </section>
@@ -276,7 +317,7 @@ figcaption .v b { color: var(--fg); font-weight: 600; }
     { r: "legend", label: "Légendaire", name: "La Bande", title: "La Nuit du 14 Juillet", flavor: "La photo que tout le monde veut. La soirée dont personne ne se souvient en entier.", place: "Chez Oscar · juil. 2026", num: "060", scene: "soiree",
       info: "<b>3</b> cartes du set · 1 tous les <b>~14</b> boosters" },
   ];
-  const DOTS = { common: "#9aa0a7", rare: "#f08a24", epic: "#3d63d6", legend: "#e2b13c" };
+  const DOTS = { common: "#9aa0a7", rare: "#f08a24", epic: "#a855f7", legend: "#e2b13c" };
   const VARIANTS = [
     { v: "normal", label: "Normale", info: "<b>95 %</b> des Épiques et Légendaires" },
     { v: "full", label: "Full art", info: "<b>5 %</b> des Épiques et Légendaires · photo plein cadre" },
