@@ -74,7 +74,8 @@ header { display: flex; justify-content: space-between; align-items: center; gap
 @keyframes shake { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-4deg) translateX(-4px); } 75% { transform: rotate(4deg) translateX(4px); } }
 
 /* ---------- Pile de cartes ---------- */
-.pile { position: absolute; width: var(--cw); aspect-ratio: 63 / 88; translate: 0 -3%; }
+/* Carte calée en haut de la scène, juste la place du titre de rareté au-dessus */
+.pile { position: absolute; width: var(--cw); aspect-ratio: 63 / 88; align-self: start; margin-top: 34px; }
 .slotc { position: absolute; inset: 0; perspective: 1400px; transition: transform .5s cubic-bezier(.4,0,.6,1), opacity .5s; }
 .slotc.rise { animation: rise .7s cubic-bezier(.2,.9,.3,1.1) both; }
 @keyframes rise { from { transform: translateY(55%) scale(.9); opacity: 0; } }
